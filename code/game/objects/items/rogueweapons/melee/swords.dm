@@ -1494,7 +1494,8 @@
 			else
 				I = M.get_inactive_held_item()
 		if(user.mind)
-			skill_diff += (user.get_skill_level(/datum/skill/combat/swords))	//You check your sword skill
+			// Include affix-based Sword-Fighting bonus from the weapon
+			skill_diff += (user.get_skill_level_with_item(/datum/skill/combat/swords, src))	//You check your sword skill
 		if(M.mind)
 			skill_diff -= (M.get_skill_level(/datum/skill/combat/wrestling))	//They check their wrestling skill to stop the weapon from being pulled.
 		user.stamina_add(rand(3,8))

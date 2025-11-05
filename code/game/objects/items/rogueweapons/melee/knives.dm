@@ -144,7 +144,7 @@
 		return
 
 	COOLDOWN_START(src, flip_cooldown, 3 SECONDS)
-	if((user.get_skill_level(/datum/skill/combat/knives) < 3) && prob(40))
+	if((user.get_skill_level_with_item(/datum/skill/combat/knives, src) < 3) && prob(40))
 		user.visible_message(
 			span_danger("While trying to flip [src] [user] drops it instead!"),
 			span_userdanger("While trying to flip [src] you drop it instead!"),

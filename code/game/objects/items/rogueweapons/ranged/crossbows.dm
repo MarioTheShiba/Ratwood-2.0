@@ -159,6 +159,11 @@
 		BB.bonus_accuracy += (user.STAPER - 8) // 8+ PER gives +1 per level. Does not decrease over range.
 		BB.bonus_accuracy += (user.get_skill_level(/datum/skill/combat/crossbows) * 5) // +5 per XBow level.
 		BB.damage *= damfactor
+		// Affix-driven % enhanced damage on ranged attacks (crossbows)
+		if(hascall(src, "get_affix_stat"))
+			var/dmg_pct = call(src, "get_affix_stat")("damage_pct_bonus", 0)
+			if(isnum(dmg_pct) && dmg_pct != 0)
+				BB.damage = round(BB.damage * (1 + dmg_pct))
 	cocked = FALSE
 	if(user.has_status_effect(/datum/status_effect/buff/clash) && ishuman(user))
 		var/mob/living/carbon/human/H = user

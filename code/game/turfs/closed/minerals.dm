@@ -147,6 +147,20 @@
 		var/newthing = pickweight(list(/obj/item/natural/rock/salt = 2, /obj/item/natural/rock/iron = 1, /obj/item/natural/rock/coal = 2))
 //		to_chat(user, "<span class='notice'>Bonus ducks!</span>")
 		new newthing(src)
+
+    // Affix: extra gem chance from pickaxe suffixes (e.g., of Miner's Fortune)
+	if(user)
+		var/obj/item/held = user.get_active_held_item()
+		if(istype(held, /obj/item/rogueweapon/pick))
+			// Query via dynamic call to avoid compile-time dependency
+			var/bonus = 0
+			if(hascall(held, "get_affix_stat"))
+				bonus = call(held, "get_affix_stat")("gem_bonus_chance", 0)
+			if(isnum(bonus) && bonus > 0)
+				// Convert to percentage roll; clamp sanity
+				var/pct = clamp(round(bonus * 100), 1, 100)
+				if(prob(pct))
+					new /obj/item/roguegem/random(src)
 	var/flags = NONE
 	if(defer_change) // TODO: make the defer change var a var for any changeturf flag
 		flags = CHANGETURF_DEFER_CHANGE

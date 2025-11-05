@@ -11,6 +11,31 @@
 /mob/proc/get_skill_level(skill)
 	return ensure_skills().get_skill_level(skill)
 
+// Returns the effective skill level including item-based affix bonuses, if any.
+// If an item is provided and it has an affix stat matching the skill, we add it.
+/mob/proc/get_skill_level_with_item(skill, obj/item/I)
+	var/base = get_skill_level(skill)
+	if(!I)
+		return base
+	if(!hascall(I, "get_affix_stat"))
+		return base
+	// Map skill type to affix stat key
+	var/stat_key
+	if(ispath(skill, /datum/skill/combat/knives))
+		stat_key = "skill_knives_bonus"
+	else if(ispath(skill, /datum/skill/combat/swords))
+		stat_key = "skill_swords_bonus"
+	else if(ispath(skill, /datum/skill/combat/bows))
+		stat_key = "skill_bows_bonus"
+	else if(ispath(skill, /datum/skill/misc/athletics))
+		stat_key = "skill_athletics_bonus"
+	if(!stat_key)
+		return base
+	var/bonus = call(I, "get_affix_stat")(stat_key, 0)
+	if(isnum(bonus))
+		return base + bonus
+	return base
+
 /mob/proc/adjust_experience(skill, amt, silent=FALSE, check_apprentice=TRUE)
 	return ensure_skills().adjust_experience(skill, amt, silent, check_apprentice)
 
