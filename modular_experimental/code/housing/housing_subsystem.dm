@@ -126,3 +126,47 @@ SUBSYSTEM_DEF(housing)
 	log_world("EXPERIMENTAL HOUSING: '[property_id]' bounds are ([min_x], [min_y], [min_z]) through ([max_x], [max_y], [max_z]).")
 
 	return TRUE
+
+
+/datum/controller/subsystem/housing/proc/write_property_region(property_id, save_flags = EXP_PROPERTY_SAVE_DEFAULT)
+	var/list/turfs = get_property_turfs(property_id)
+
+	if(!length(turfs))
+		log_world("EXPERIMENTAL HOUSING: Cannot write '[property_id]', no property turfs are registered.")
+		return null
+
+	var/list/bounds = get_property_bounds(property_id)
+
+	if(!bounds)
+		log_world("EXPERIMENTAL HOUSING: Cannot write '[property_id]', failed to calculate property bounds.")
+		return null
+
+	var/min_x = bounds["min_x"]
+	var/min_y = bounds["min_y"]
+	var/min_z = bounds["min_z"]
+
+	var/max_x = bounds["max_x"]
+	var/max_y = bounds["max_y"]
+	var/max_z = bounds["max_z"]
+
+	return experimental_property_write_map(min_x, min_y, min_z, max_x, max_y, max_z, save_flags, turfs)
+
+
+// remove this later
+/datum/controller/subsystem/housing/proc/debug_save_property(property_id)
+	var/map_text = write_property_region(property_id)
+
+	if(!map_text)
+		log_world("EXPERIMENTAL HOUSING: Failed to save '[property_id]'.")
+		return FALSE
+
+	var/save_path = "data/experimental_[sanitize_filename(property_id)].dmm"
+
+	if(fexists(save_path))
+		fdel(save_path)
+
+	text2file(map_text, save_path)
+
+	log_world("EXPERIMENTAL HOUSING: Saved '[property_id]' to '[save_path]'.")
+
+	return TRUE

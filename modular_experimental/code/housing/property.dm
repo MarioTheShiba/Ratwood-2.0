@@ -26,6 +26,7 @@
 	) as null|anything in list(
 		"Save 7x7 Property",
 		"Load 7x7 Property",
+		"Save Irregular Test Apartment",
 		"Cancel"
 	)
 
@@ -35,7 +36,13 @@
 	if(choice == "Load 7x7 Property")
 		load_test_property(user)
 
+	if(choice == "Save Irregular Test Apartment")
+	if(SShousing.debug_save_property("test_apartment"))
+		to_chat(user, span_notice("Saved irregular test apartment."))
+	else
+		to_chat(user, span_warning("Failed to save irregular test apartment."))
 
+// debug stuff
 
 /obj/structure/experimental_property_test/proc/save_test_property(mob/user)
 	var/turf/start = get_turf(src)
@@ -51,14 +58,7 @@
 		to_chat(user, span_warning("The test property would extend outside the map."))
 		return FALSE
 
-	var/map_text = experimental_property_write_map(
-		start.x,
-		start.y,
-		start.z,
-		max_x,
-		max_y,
-		start.z
-	)
+	var/map_text = experimental_property_write_map(start.x, start.y, start.z, max_x, max_y, start.z)
 
 	if(!map_text)
 		to_chat(user, span_warning("Failed to generate property map data."))

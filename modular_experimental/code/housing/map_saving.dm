@@ -1,22 +1,3 @@
-/*
- * Experimental persistent housing map writer.
- *
- * Ratwood retains runtime DMM/TGM loading but removed its map writer.
- * This is a deliberately limited writer intended only for persistent
- * property interiors.
- *
- * Phase 1 saves:
- * - turfs
- * - areas
- * - non-item objects
- *
- * It deliberately does NOT save: (yet)
- * - mobs
- * - loose items
- * - landmarks/effects
- * - inventories
- * - UUID/stasis data
- */
 
 // this is basically repurposed Ratworld code.
 
@@ -167,7 +148,8 @@
 	max_x,
 	max_y,
 	max_z,
-	save_flags = EXP_PROPERTY_SAVE_DEFAULT
+	save_flags = EXP_PROPERTY_SAVE_DEFAULT,
+	list/allowed_turfs = null
 )
 	/*
 	 * normalise coordinates so callers don't need to care which corner
@@ -176,7 +158,7 @@
 	var/real_min_x = min(min_x, max_x)
 	var/real_max_x = max(min_x, max_x)
 
-	var/real_min_y = min(min_y, max_y)
+	var/real_min_y = min(min_y, max_y) 
 	var/real_max_y = max(min_y, max_y)
 
 	var/real_min_z = min(min_z, max_z)
@@ -224,11 +206,15 @@
 					real_min_y + y_offset,
 					real_min_z + z_offset
 				)
+				var/save_current_turf = TRUE
+
+				if(allowed_turfs)
+					save_current_turf = !!allowed_turfs[current_turf]
 
 				var/turf/turf_type = /turf/template_noop
 				var/area/area_type = /area/template_noop
 
-				if(current_turf)
+				if(current_turf && save_current_turf)
 					if(save_flags & EXP_PROPERTY_SAVE_TURFS)
 						turf_type = current_turf.type
 
@@ -247,7 +233,7 @@
 				 * Save structures/machinery/etc, but never loose items
 				 * or /obj/effect internals during Phase 1.
 				 */
-				if(current_turf && (save_flags & EXP_PROPERTY_SAVE_OBJECTS))
+				if(current_turf && save_current_turf && (save_flags & EXP_PROPERTY_SAVE_OBJECTS))
 					for(var/obj/thing in current_turf)
 						CHECK_TICK
 
