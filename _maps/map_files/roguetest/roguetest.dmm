@@ -617,9 +617,11 @@
 /turf/open/floor/rogue/carpet/lord,
 /area/rogue/indoors)
 "sG" = (
-/obj/structure/dungeon_entry/center,
-/turf/open/floor/rogue/dirt/road,
-/area/rogue/outdoors)
+/obj/effect/landmark/property_region{
+	property_id = test_apartment
+	},
+/turf/open/floor/rogue/wood,
+/area/rogue/outdoors/rtfield)
 "sJ" = (
 /obj/structure/roguewindow,
 /turf/open/floor/rogue/blocks/newstone/alt,
@@ -1074,6 +1076,13 @@
 "CZ" = (
 /turf/open/floor/rogue/dirt/road,
 /area/rogue/indoors)
+"Dd" = (
+/obj/effect/landmark/property_region{
+	property_id = test_apartment
+	},
+/obj/structure/table/finestone,
+/turf/open/floor/rogue/wood,
+/area/rogue/outdoors/rtfield)
 "Dh" = (
 /obj/structure/handcart{
 	dir = 4
@@ -1197,6 +1206,15 @@
 /obj/item/flashlight/flare/torch/lantern,
 /turf/open/floor/rogue/cobblerock,
 /area/rogue/outdoors)
+"It" = (
+/obj/effect/landmark/property_region{
+	property_id = test_apartment
+	},
+/obj/effect/landmark/property_region{
+	property_id = test_apartment
+	},
+/turf/closed/wall/mineral/rogue/wooddark/horizontal,
+/area/rogue/outdoors/rtfield)
 "IE" = (
 /obj/structure/table/wood{
 	icon_state = "longtable"
@@ -1442,8 +1460,10 @@
 /turf/open/floor/rogue/dirt/road,
 /area/rogue/outdoors)
 "Of" = (
-/obj/structure/fluff/railing/corner/north_east,
-/turf/closed/mineral/random/rogue,
+/obj/effect/landmark/property_region{
+	property_id = test_apartment
+	},
+/turf/closed/wall/mineral/rogue/wooddark/horizontal,
 /area/rogue/outdoors/rtfield)
 "Oh" = (
 /obj/structure/table/cooling,
@@ -1523,6 +1543,13 @@
 "Qr" = (
 /turf/open/floor/rogue/rooftop/green/east,
 /area/rogue/outdoors)
+"Qt" = (
+/obj/structure/mineral_door/wood,
+/obj/effect/landmark/property_region{
+	property_id = test_apartment
+	},
+/turf/open/floor/rogue/dirt/road,
+/area/rogue/outdoors/rtfield)
 "Rk" = (
 /turf/open/floor/rogue/dirt/road,
 /area/rogue/outdoors/rtfield)
@@ -1544,6 +1571,13 @@
 /obj/item/rogueweapon/huntingknife/idagger,
 /turf/open/floor/rogue/dirt/road,
 /area/rogue/indoors)
+"Sx" = (
+/obj/effect/landmark/property_region{
+	property_id = test_apartment
+	},
+/obj/machinery/light/rogue/candle/floorcandle,
+/turf/open/floor/rogue/wood,
+/area/rogue/outdoors/rtfield)
 "Sy" = (
 /obj/structure/rack/rogue/shelf/biggest,
 /obj/item/reagent_containers/glass/bottle/rogue,
@@ -1738,9 +1772,12 @@
 /turf/open/floor/rogue/blocks/stonered/tiny,
 /area/rogue/indoors)
 "XN" = (
-/obj/structure/dungeon_entry/hamlet,
-/turf/open/floor/rogue/dirt/road,
-/area/rogue/outdoors)
+/obj/effect/landmark/property_region{
+	property_id = test_apartment
+	},
+/obj/structure/bed/rogue,
+/turf/open/floor/rogue/wood,
+/area/rogue/outdoors/rtfield)
 "XU" = (
 /obj/item/rogueweapon/shovel/small,
 /turf/open/floor/rogue/dirt/road,
@@ -3243,7 +3280,7 @@ rT
 rT
 rT
 rT
-XN
+rT
 rT
 rT
 rT
@@ -3302,21 +3339,21 @@ rT
 rT
 rT
 vq
-hh
-hh
-hh
-hh
-hh
-hh
-ej
-ej
-ej
-ej
-ej
-ej
-WL
-WL
-WL
+Rk
+Rk
+Rk
+Of
+Of
+Of
+Of
+Of
+Of
+Of
+Of
+Rk
+Rk
+Rk
+Rk
 AO
 AO
 dB
@@ -3354,21 +3391,21 @@ rT
 rT
 rT
 vq
-hh
-hh
-hh
-hh
-hh
-hh
-ej
-ej
-ej
-ej
-ej
-ej
-WL
-WL
-WL
+Rk
+Rk
+Rk
+Of
+Dd
+sG
+sG
+sG
+sG
+Sx
+Of
+Rk
+Rk
+Rk
+Rk
 AO
 AO
 dB
@@ -3406,21 +3443,21 @@ rT
 rT
 rT
 mq
-hh
-hh
-hh
-hh
-hh
-hh
-ej
-ej
-ej
-ej
-ej
-ej
-WL
-WL
-WL
+Rk
+Rk
+Rk
+Of
+sG
+sG
+Of
+Of
+Of
+sG
+Of
+Rk
+Rk
+Rk
+Rk
 AO
 AO
 dB
@@ -3451,28 +3488,28 @@ rT
 rT
 rT
 rT
-sG
+rT
 rT
 rT
 rT
 rT
 rT
 vq
-hh
-hh
-hh
+Rk
+Rk
+Rk
 Of
-hh
-hh
-ej
-ej
-ej
-ej
-ej
-ej
-WL
-WL
-WL
+sG
+Sx
+Of
+Rk
+Of
+XN
+Of
+Rk
+Rk
+Rk
+Rk
 AO
 AO
 dB
@@ -3510,21 +3547,21 @@ rT
 rT
 rT
 vq
-hh
-hh
-hh
-hh
-hh
-hh
-ej
-ej
-ej
-ej
-ej
-ej
-WL
-WL
-WL
+Rk
+Rk
+Rk
+It
+Qt
+Of
+Of
+Rk
+Of
+Of
+Of
+Rk
+Rk
+Rk
+Rk
 AO
 AO
 dB
