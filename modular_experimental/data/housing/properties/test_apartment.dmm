@@ -4,6 +4,11 @@
 /area/rogue/indoors/shelter/rtfield)
 "b" = (
 /obj/structure/table/finestone,
+/obj/item/candle/candlestick/silver/lit{
+	pixel_x = -2;
+	pixel_y = 2;
+	atc_sealed = 1
+	},
 /turf/open/floor/rogue/wood,
 /area/rogue/outdoors/rtfield)
 "c" = (
@@ -14,13 +19,29 @@
 /turf/open/floor/rogue/wood,
 /area/rogue/outdoors/rtfield)
 "e" = (
-/turf/template_noop,
-/area/template_noop)
+/obj/item/roguestatue/glass/design4{
+	pixel_x = 3;
+	pixel_y = 3;
+	atc_sealed = 1
+	},
+/turf/open/floor/rogue/wood,
+/area/rogue/outdoors/rtfield)
 "f" = (
-/obj/structure/bed/rogue,
+/obj/item/book/rogue/necra{
+	pixel_x = -5;
+	pixel_y = 3;
+	atc_sealed = 1
+	},
 /turf/open/floor/rogue/wood,
 /area/rogue/outdoors/rtfield)
 "g" = (
+/turf/template_noop,
+/area/template_noop)
+"h" = (
+/obj/structure/bed/rogue,
+/turf/open/floor/rogue/wood,
+/area/rogue/outdoors/rtfield)
+"i" = (
 /obj/structure/mineral_door/wood,
 /turf/open/floor/rogue/dirt/road,
 /area/rogue/outdoors/rtfield)
@@ -47,8 +68,8 @@ a
 "}
 (3,1,1) = {"
 a
-c
-c
+e
+f
 a
 a
 a
@@ -60,17 +81,17 @@ a
 c
 d
 a
-e
+g
 a
-f
+h
 a
 "}
 (5,1,1) = {"
 a
+i
+a
+a
 g
-a
-a
-e
 a
 a
 a

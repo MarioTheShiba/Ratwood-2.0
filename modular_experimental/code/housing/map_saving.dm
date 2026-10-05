@@ -83,9 +83,13 @@
 	return experimental_property_tgm_encode("[value]")
 
 
-/proc/experimental_property_generate_metadata(atom/thing)
+/proc/experimental_property_generate_metadata(atom/thing, list/forced_values = null)
 	var/list/data_to_add = list()
 	var/list/vars_to_save = thing.experimental_get_save_vars()
+
+	if(forced_values)
+		for(var/forced_var in forced_values)
+			vars_to_save |= forced_var
 
 	for(var/variable in vars_to_save)
 		CHECK_TICK
@@ -93,10 +97,19 @@
 		if(!(variable in thing.vars))
 			continue
 
-		var/value = thing.vars[variable]
+		var/is_forced = forced_values && (variable in forced_values)
+		var/value
 
-		// don't clutter the generated map with default values.
-		if(value == initial(thing.vars[variable]))
+		if(is_forced)
+			value = forced_values[variable]
+		else
+			value = thing.vars[variable]
+
+		/*
+		 * Normally we skip default values to keep the DMM clean.
+		 * Forced values must be written even if they match the initial value.
+		 */
+		if(!is_forced && value == initial(thing.vars[variable]))
 			continue
 
 		if(!issaved(thing.vars[variable]))
@@ -237,8 +250,17 @@
 					for(var/obj/thing in current_turf)
 						CHECK_TICK
 
+						var/list/forced_metadata = null
+
 						if(isitem(thing))
-							continue
+							var/obj/item/I = thing
+
+							if(!I.experimental_can_persist_in_property())
+								continue
+
+							forced_metadata = list(
+								"atc_sealed" = TRUE
+							)
 
 						if(istype(thing, /obj/effect))
 							continue
@@ -246,7 +268,7 @@
 						if(istype(thing, /obj/structure/experimental_property_test))
 							continue
 
-						var/metadata = experimental_property_generate_metadata(thing)
+						var/metadata = experimental_property_generate_metadata(thing, forced_metadata)
 
 						if(has_contents)
 							current_header += ",\n"
