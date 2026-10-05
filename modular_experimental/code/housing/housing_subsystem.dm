@@ -1,18 +1,3 @@
-/*
- * Experimental Housing Subsystem
- *
- * Handles the runtime registry of property regions.
- *
- * For irregular properties, particularly apartments:
- *
- * property_turfs["apartment_01"][T] = TRUE
- *
- * The inner list is associative so membership checks are cheap:
- *
- * if(property_turfs["apartment_01"][T])
- *
- * Ownership, rent, banking, tenancy, etc. come later.
- */
 
 SUBSYSTEM_DEF(housing)
 	name = "Experimental Housing"

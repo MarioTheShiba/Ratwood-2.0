@@ -1,16 +1,3 @@
-/*
- * Experimental Housing
- * Property item persistence rules.
- *
- * Ordinary loose items may persist unless they belong to a broad
- * economically or mechanically valuable category.
- *
- * Saved loose items are ATC sealed when serialized so they cannot
- * be repeatedly exported through the Navigator.
- *
- * Safes will use their own stricter rules later.
- */
-
 
 /obj/item
 	/*

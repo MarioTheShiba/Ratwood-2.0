@@ -6,3 +6,7 @@
 
 #define EXP_PROPERTY_DMM_HEADER "//MAP CONVERTED BY dmm2tgm.py THIS HEADER COMMENT PREVENTS RECONVERSION, DO NOT REMOVE"
 #define EXP_HOUSING_PROPERTY_DIRECTORY "modular_experimental/data/housing/properties"
+
+#define EXP_HOUSING_SAFE_DIRECTORY "modular_experimental/data/housing/safes"
+#define EXP_HOUSING_SAFE_RECORD_VERSION 1
+#define EXP_HOUSING_SAFE_DEFAULT_SLOTS 4

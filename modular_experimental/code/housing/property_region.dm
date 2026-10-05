@@ -1,18 +1,3 @@
-/*
- * Experimental faux property-area marker.
- *
- * Place this on every turf belonging to an irregular property.
- *
- * Every marker making up the same property should share the same
- * property_id.
- *
- * Example:
- *
- * property_id = "apartment_01"
- *
- * During map initialization the marker registers its turf with
- * SShousing and then deletes itself.
- */
 
 
 /obj/effect/landmark/property_region
