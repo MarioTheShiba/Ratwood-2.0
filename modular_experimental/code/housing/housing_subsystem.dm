@@ -160,7 +160,7 @@ SUBSYSTEM_DEF(housing)
 		log_world("EXPERIMENTAL HOUSING: Failed to save '[property_id]'.")
 		return FALSE
 
-	var/save_path = "data/experimental_[sanitize_filename(property_id)].dmm"
+	var/save_path = experimental_property_get_save_path(property_id)
 
 	if(fexists(save_path))
 		fdel(save_path)
@@ -168,5 +168,75 @@ SUBSYSTEM_DEF(housing)
 	text2file(map_text, save_path)
 
 	log_world("EXPERIMENTAL HOUSING: Saved '[property_id]' to '[save_path]'.")
+
+	return TRUE
+
+
+// remove this later
+/datum/controller/subsystem/housing/proc/debug_load_property(property_id)
+	var/list/turfs = get_property_turfs(property_id)
+
+	if(!length(turfs))
+		log_world("EXPERIMENTAL HOUSING: Cannot load '[property_id]', no property turfs are registered.")
+		return FALSE
+
+	var/list/bounds = get_property_bounds(property_id)
+
+	if(!bounds)
+		log_world("EXPERIMENTAL HOUSING: Cannot load '[property_id]', failed to calculate property bounds.")
+		return FALSE
+
+	var/save_path = experimental_property_get_save_path(property_id)
+
+	if(!save_path || !fexists(save_path))
+		log_world("EXPERIMENTAL HOUSING: Cannot load '[property_id]', save file '[save_path]' does not exist.")
+		return FALSE
+
+	var/min_x = bounds["min_x"]
+	var/min_y = bounds["min_y"]
+	var/min_z = bounds["min_z"]
+
+	var/turf/start = locate(min_x, min_y, min_z)
+
+	if(!start)
+		log_world("EXPERIMENTAL HOUSING: Cannot load '[property_id]', invalid starting turf.")
+		return FALSE
+
+	/*
+	 * Clear saved structures only from actual property turfs.
+	 *
+	 * The NOOP holes are not part of this list, so anything on those
+	 * tiles is left completely alone.
+	 */
+	for(var/turf/T as anything in turfs)
+		CHECK_TICK
+
+		for(var/obj/thing in T)
+			if(isitem(thing))
+				continue
+
+			if(istype(thing, /obj/effect))
+				continue
+
+			if(istype(thing, /obj/structure/experimental_property_test))
+				continue
+
+			qdel(thing)
+
+	var/datum/map_template/template = new(
+		save_path,
+		"Experimental Property [property_id]"
+	)
+
+	var/list/loaded_bounds = template.load(start)
+
+	if(!loaded_bounds)
+		log_world("EXPERIMENTAL HOUSING: Failed to load '[property_id]' from '[save_path]'.")
+		qdel(template)
+		return FALSE
+
+	qdel(template)
+
+	log_world("EXPERIMENTAL HOUSING: Loaded '[property_id]' from '[save_path]'.")
 
 	return TRUE

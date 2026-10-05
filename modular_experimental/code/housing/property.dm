@@ -10,7 +10,7 @@
 	var/property_width = 7
 	var/property_height = 7
 
-	var/save_path = "data/experimental_test_property.dmm"
+	var/save_path = "modular_experimental/data/housing/properties/legacy_test_property.dmm"
 
 
 /obj/structure/experimental_property_test/attack_hand(mob/user)
@@ -27,6 +27,7 @@
 		"Save 7x7 Property",
 		"Load 7x7 Property",
 		"Save Irregular Test Apartment",
+		"Load Irregular Test Apartment",
 		"Cancel"
 	)
 
@@ -37,12 +38,18 @@
 		load_test_property(user)
 
 	if(choice == "Save Irregular Test Apartment")
-	if(SShousing.debug_save_property("test_apartment"))
-		to_chat(user, span_notice("Saved irregular test apartment."))
-	else
-		to_chat(user, span_warning("Failed to save irregular test apartment."))
+		if(SShousing.debug_save_property("test_apartment"))
+			to_chat(user, span_notice("Saved irregular test apartment."))
+		else
+			to_chat(user, span_warning("Failed to save irregular test apartment."))
 
-// debug stuff
+	if(choice == "Load Irregular Test Apartment")
+		if(SShousing.debug_load_property("test_apartment"))
+			to_chat(user, span_notice("Loaded irregular test apartment."))
+		else
+			to_chat(user, span_warning("Failed to load irregular test apartment."))
+
+// debug stuff and stuff
 
 /obj/structure/experimental_property_test/proc/save_test_property(mob/user)
 	var/turf/start = get_turf(src)

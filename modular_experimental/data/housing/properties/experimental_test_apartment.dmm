@@ -1,0 +1,77 @@
+//MAP CONVERTED BY dmm2tgm.py THIS HEADER COMMENT PREVENTS RECONVERSION, DO NOT REMOVE
+"a" = (
+/turf/closed/wall/mineral/rogue/wooddark/horizontal,
+/area/rogue/indoors/shelter/rtfield)
+"b" = (
+/obj/structure/table/finestone,
+/turf/open/floor/rogue/wood,
+/area/rogue/outdoors/rtfield)
+"c" = (
+/turf/open/floor/rogue/wood,
+/area/rogue/outdoors/rtfield)
+"d" = (
+/obj/machinery/light/rogue/candle/floorcandle,
+/turf/open/floor/rogue/wood,
+/area/rogue/outdoors/rtfield)
+"e" = (
+/turf/template_noop,
+/area/template_noop)
+"f" = (
+/obj/structure/bed/rogue,
+/turf/open/floor/rogue/wood,
+/area/rogue/outdoors/rtfield)
+"g" = (
+/obj/structure/mineral_door/wood,
+/turf/open/floor/rogue/dirt/road,
+/area/rogue/outdoors/rtfield)
+
+(1,1,1) = {"
+a
+a
+a
+a
+a
+a
+a
+a
+"}
+(2,1,1) = {"
+a
+b
+c
+c
+c
+c
+d
+a
+"}
+(3,1,1) = {"
+a
+c
+c
+a
+a
+a
+c
+a
+"}
+(4,1,1) = {"
+a
+c
+d
+a
+e
+a
+f
+a
+"}
+(5,1,1) = {"
+a
+g
+a
+a
+e
+a
+a
+a
+"}

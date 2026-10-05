@@ -278,3 +278,9 @@
 			map_output += "\"}"
 
 	return "[EXP_PROPERTY_DMM_HEADER]\n[header_output.Join("")][map_output.Join("")]"
+
+/proc/experimental_property_get_save_path(property_id)
+	if(!istext(property_id) || !length(property_id))
+		return null
+
+	return "[EXP_HOUSING_PROPERTY_DIRECTORY]/[sanitize_filename(property_id)].dmm"
