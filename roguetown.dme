@@ -3547,6 +3547,7 @@
 #include "modular_experimental\code\housing\map_saving.dm"
 #include "modular_experimental\code\housing\property.dm"
 #include "modular_experimental\code\housing\property_items.dm"
+#include "modular_experimental\code\housing\safe_rules.dm"
 #include "modular_experimental\code\housing\safe_persistence.dm"
 #include "modular_experimental\code\housing\safe.dm"
 #include "modular_experimental\code\housing\property_region.dm"

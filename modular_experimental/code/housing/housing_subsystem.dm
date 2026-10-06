@@ -25,9 +25,7 @@ SUBSYSTEM_DEF(housing)
 	if(!T)
 		return FALSE
 
-	/*
-	 * One turf should never belong to two properties.
-	 */
+
 	var/existing_property_id = property_by_turf[T]
 
 	if(existing_property_id && existing_property_id != property_id)
@@ -146,7 +144,7 @@ SUBSYSTEM_DEF(housing)
 	return experimental_property_write_map(min_x, min_y, min_z, max_x, max_y, max_z, save_flags, turfs)
 
 
-// remove this later
+//!!!!remove this later!!!!
 /datum/controller/subsystem/housing/proc/debug_save_property(property_id)
 	var/map_text = write_property_region(property_id)
 
@@ -166,7 +164,7 @@ SUBSYSTEM_DEF(housing)
 	return TRUE
 
 
-// remove this later
+// !!!!!!remove later!!!!!
 /datum/controller/subsystem/housing/proc/debug_load_property(property_id)
 	var/list/turfs = get_property_turfs(property_id)
 
@@ -196,12 +194,7 @@ SUBSYSTEM_DEF(housing)
 		log_world("EXPERIMENTAL HOUSING: Cannot load '[property_id]', invalid starting turf.")
 		return FALSE
 
-	/*
-	 * Clear saved structures only from actual property turfs.
-	 *
-	 * The NOOP holes are not part of this list, so anything on those
-	 * tiles is left completely alone.
-	 */
+
 	for(var/turf/T as anything in turfs)
 		CHECK_TICK
 

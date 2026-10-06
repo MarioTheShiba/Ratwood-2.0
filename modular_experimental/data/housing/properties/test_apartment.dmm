@@ -4,11 +4,6 @@
 /area/rogue/indoors/shelter/rtfield)
 "b" = (
 /obj/structure/table/finestone,
-/obj/item/candle/candlestick/silver/lit{
-	pixel_x = -2;
-	pixel_y = 2;
-	atc_sealed = 1
-	},
 /turf/open/floor/rogue/wood,
 /area/rogue/outdoors/rtfield)
 "c" = (
@@ -19,30 +14,26 @@
 /turf/open/floor/rogue/wood,
 /area/rogue/outdoors/rtfield)
 "e" = (
-/obj/item/roguestatue/glass/design4{
-	pixel_x = 3;
-	pixel_y = 3;
-	atc_sealed = 1
+/obj/machinery/light/rogue/candle/floorcandle,
+/obj/structure/experimental_home_safe{
+	safe_id = "test_apartment_safe_fd1503e26438";
+	bound_property_id = "test_apartment"
 	},
 /turf/open/floor/rogue/wood,
 /area/rogue/outdoors/rtfield)
 "f" = (
-/obj/item/book/rogue/necra{
-	pixel_x = -5;
-	pixel_y = 3;
-	atc_sealed = 1
-	},
-/turf/open/floor/rogue/wood,
-/area/rogue/outdoors/rtfield)
-"g" = (
 /turf/template_noop,
 /area/template_noop)
-"h" = (
+"g" = (
 /obj/structure/bed/rogue,
 /turf/open/floor/rogue/wood,
 /area/rogue/outdoors/rtfield)
-"i" = (
-/obj/structure/mineral_door/wood,
+"h" = (
+/obj/structure/mineral_door/wood{
+	icon_state = "woodhandleopen";
+	density = 0;
+	opacity = 0
+	},
 /turf/open/floor/rogue/dirt/road,
 /area/rogue/outdoors/rtfield)
 
@@ -68,8 +59,8 @@ a
 "}
 (3,1,1) = {"
 a
-e
-f
+c
+c
 a
 a
 a
@@ -79,19 +70,19 @@ a
 (4,1,1) = {"
 a
 c
-d
+e
+a
+f
 a
 g
-a
-h
 a
 "}
 (5,1,1) = {"
 a
-i
+h
 a
 a
-g
+f
 a
 a
 a

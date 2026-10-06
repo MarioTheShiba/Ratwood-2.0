@@ -21,9 +21,7 @@
 	if(istype(src, /obj/item/roguecoin))
 		return FALSE
 
-	/*
-	 * rraw economic resources.
-	 */
+
 	if(istype(src, /obj/item/rogueore))
 		return FALSE
 
@@ -33,40 +31,22 @@
 	if(istype(src, /obj/item/stack))
 		return FALSE
 
-	/*
-	 * weapons and ammunition.
-	 *
-	 * safes may eventually allow selected weapons through their
-	 * separate persistence system.
-	 */
+
 	if(istype(src, /obj/item/rogueweapon))
 		return FALSE
 
 	if(istype(src, /obj/item/ammo_casing))
 		return FALSE
 
-	/*
-	 * filled storage is deliberately not part of ordinary room
-	 * persistence. Otherwise a harmless bag becomes a way to smuggle
-	 * an entire persistent inventory into the property save.
-	 */
+
 	if(istype(src, /obj/item/storage))
 		return FALSE
 
-	/*
-	 * reagents are consumable resources and can contain medicines,
-	 * poison, alcohol, crafting chemicals, etc.
-	 */
+
 	if(istype(src, /obj/item/reagent_containers))
 		return FALSE
 
-	/*
-	 * ratwood armor is spread across several different type trees,
-	 * so armor_class is a cleaner filter than trying to enumerate
-	 * every suit/helmet/glove parent.
-	 *
-	 * ordinary clothing remains allowed.
-	 */
+
 	if(istype(src, /obj/item/clothing))
 		var/obj/item/clothing/C = src
 

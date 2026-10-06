@@ -4,12 +4,6 @@
 */
 
 /datum/controller/subsystem/housing
-	/*
-	 * runtime registry of physical persistent safes.
-	 *
-	 * Duplicate IDs are forbidden. Two physical safes must never
-	 * point at the same persistent inventory. just so we dont have two safes with the same id so people have like bluespace safes or somethin
-	 */
 	var/list/safe_instances = list()
 
 
@@ -70,41 +64,15 @@
 	AddComponent(/datum/component/storage/concrete/experimental_safe)
 
 
-/obj/structure/experimental_home_safe/Initialize(mapload)
-	. = ..()
-
-	if(!istext(safe_id) || !length(safe_id))
-		log_mapping(
-			"Persistent home safe at [AREACOORD(src)] has no safe_id."
-		)
-
-		return INITIALIZE_HINT_QDEL
-
-	if(!SShousing.register_safe(safe_id, src))
-		return INITIALIZE_HINT_QDEL
-
-	load_persistent_contents()
-
-	return .
 
 
 /obj/structure/experimental_home_safe/Destroy()
 	var/datum/component/storage/concrete/experimental_safe/storage = GetComponent(/datum/component/storage/concrete/experimental_safe)
 
 	if(storage)
-		/*
-		 * property loading qdels the old safe before reconstructing
-		 * the saved room.
-		 *
-		 * destroying that temporary physical instance must NOT be
-		 * mistaken for the player withdrawing every stored item.
-		 */
 		storage.suppress_persistence = TRUE
 
-	/*
-	 * magnum condom protection against item deletion callbacks
-	 * while the physical safe is disappearing.
-	 */
+
 	for(var/obj/item/I in src)
 		I.experimental_safe_slot = null
 
@@ -117,12 +85,7 @@
 /obj/structure/experimental_home_safe/experimental_get_save_vars()
 	. = ..()
 
-	/*
-	 * absolutely necessary.
-	 *
-	 * the physical safe can be reconstructed by the property DMM,
-	 * so its stable persistence identity must survive that process.
-	 */
+
 	. |= "safe_id"
 	. |= "bound_property_id"
 	. |= "max_persistent_slots"
@@ -134,13 +97,7 @@
 	if(!user?.client)
 		return
 
-	/*
-	 * rw's stock storage component primarily expects portable
-	 * storage to be held by the user.
-	 *
-	 * this is a stationary structure, so explicitly ask the component
-	 * to show its storage UI.
-	 */
+
 	SEND_SIGNAL(src, COMSIG_TRY_STORAGE_SHOW, user)
 
 
@@ -156,13 +113,7 @@
 		if(runtime_occupied)
 			continue
 
-		/*
-		 * existing files, including malformed records, count as
-		 * occupied.
-		 *
-		 * we fail closed instead of overwriting potentially valuable
-		 * player data.
-		 */
+
 		if(SShousing.safe_slot_exists(safe_id, slot))
 			continue
 
@@ -193,10 +144,6 @@
 		if(!I)
 			continue
 
-		/*
-		 * the item was constructed directly inside the safe instead
-		 * of passing through normal player insertion.
-		 */
 		I.item_flags |= IN_STORAGE
 		I.on_enter_storage(storage, null)
 
@@ -211,24 +158,15 @@
 
 	screen_max_rows = EXP_HOUSING_SAFE_DEFAULT_SLOTS
 	screen_max_columns = 1
-
+	intercept_parent_attack = FALSE
 	allow_quick_empty = FALSE
 	allow_quick_gather = FALSE
 	allow_dump_out = FALSE
 	click_gather = FALSE
 
-	/*
-	 * set while the entire physical safe is being destroyed/replaced.
-	 *
-	 * its disk records must survive that process.
-	 */
 	var/tmp/suppress_persistence = FALSE
 
-	/*
-	 * used so our COMSIG_ATOM_EXITED fallback knows that a departure
-	 * is already going through the normal transactional withdrawal
-	 * path.
-	 */
+
 	var/tmp/obj/item/transactional_removal = null
 
 
@@ -272,30 +210,7 @@
 	load_persistent_contents()
 
 
-/datum/component/storage/concrete/experimental_safe/slave_can_insert_object(
-	datum/component/storage/slave,
-	obj/item/I,
-	stop_messages = FALSE,
-	mob/M
-)
-	var/obj/structure/experimental_home_safe/safe = parent
 
-	if(!istype(safe))
-		return FALSE
-
-	if(!I?.experimental_can_persist_in_safe())
-		if(M)
-			to_chat(M, span_warning("[I] cannot be stored persistently in [safe]."))
-
-		return FALSE
-
-	if(isnull(safe.get_free_persistent_slot()))
-		if(M)
-			to_chat(M, span_warning("[safe] has no free persistent slots."))
-
-		return FALSE
-
-	return TRUE
 
 
 /datum/component/storage/concrete/experimental_safe/_insert_physical_item(obj/item/I, override = FALSE)
@@ -312,13 +227,6 @@
 	if(isnull(slot))
 		return FALSE
 
-	/*
-	 * move the item physically first.
-	 *
-	 * If the disk transaction then fails, returning FALSE causes the
-	 * normal storage code to put the item back into the user's hand
-	 * or onto the turf.
-	 */
 	if(!..())
 		return FALSE
 
@@ -352,22 +260,11 @@
 
 	var/slot = I.experimental_safe_slot
 
-	/*
-	 * safe destruction/property reconstruction must not alter the
-	 * persistent backend.
-	 */
+
 	if(suppress_persistence || isnull(slot))
 		return ..()
 
-	/*
-	 * TRANSACTIONAL WITHDRAWAL
-	 *
-	 * the disk record disappears BEFORE the physical item is allowed
-	 * to leave.
-	 *
-	 * therefore a crash between the two operations can lose the item,
-	 * but it cannot duplicate it.
-	 */
+
 	if(!SShousing.delete_safe_slot(safe.safe_id, slot))
 		log_world(
 			"EXPERIMENTAL HOUSING: Refusing withdrawal from safe '[safe.safe_id]' slot [slot] because its persistent record could not be removed."
@@ -382,10 +279,6 @@
 	transactional_removal = null
 
 	if(!success)
-		/*
-		 * physical withdrawal somehow failed after the record was
-		 * removed. Recreate the record while the item is still here.
-		 */
 		if(!SShousing.write_safe_slot(safe.safe_id, slot, I))
 			log_world(
 				"EXPERIMENTAL HOUSING: OUGH FUCK! Could not roll back safe '[safe.safe_id]' slot [slot] after failed withdrawal."
@@ -416,10 +309,7 @@
 
 	var/obj/item/I = thing
 
-	/*
-	 * normal withdrawals already deleted their disk record before
-	 * forceMove() happened.
-	 */
+
 	if(I == transactional_removal)
 		return
 
@@ -433,17 +323,7 @@
 	if(!istype(safe))
 		return
 
-	/*
-	 * FALLBACK CONSISTENCY GUARD
-	 *
-	 * some unrelated code could theoretically forceMove() an item out
-	 * of the safe without using remove_from_storage().
-	 *
-	 * if that happens somehow, immediately delete the backing record.
-	 *
-	 * uf deletion fails, put the item back into the safe rather than
-	 * allowing disk and runtime state to disagree.
-	 */
+
 	if(!SShousing.delete_safe_slot(safe.safe_id, slot))
 		log_world(
 			"EXPERIMENTAL HOUSING: Unexpected removal from safe '[safe.safe_id]' slot [slot] could not be committed. Returning item to safe."
@@ -465,12 +345,6 @@
 	var/property_slug = sanitize_filename(property_id)
 
 	for(var/attempt in 1 to 20)
-		/*
-		 * we only need to generate this once.
-		 *
-		 * da generated value is subsequently stored in the property's
-		 * DMM, so it does NOT change between rounds.
-		 */
 		var/hash = md5(
 			"[property_id]|[world.realtime]|[world.time]|[rand(1, 2147483647)]|\ref[src]|[attempt]"
 		)
@@ -487,13 +361,56 @@
 	return null
 
 
+/obj/structure/experimental_home_safe/attackby(obj/item/I, mob/living/user, params)
+	var/datum/component/storage/concrete/experimental_safe/storage = GetComponent(
+		/datum/component/storage/concrete/experimental_safe
+	)
+
+	if(!storage)
+		return ..()
+
+
+	if(!I.experimental_can_persist_in_safe())
+		to_chat(
+			user,
+			span_warning("[I] cannot be stored persistently in [src].")
+		)
+
+		return TRUE
+
+	if(isnull(get_free_persistent_slot()))
+		to_chat(
+			user,
+			span_warning("[src] has no free storage slots.")
+		)
+
+		return TRUE
+
+
+	if(!storage.can_be_inserted(I, FALSE, user))
+		to_chat(
+			user,
+			span_warning("[I] does not fit inside [src].")
+		)
+
+		return TRUE
+
+
+	if(!storage.handle_item_insertion(I, FALSE, user))
+		to_chat(
+			user,
+			span_warning("[src] fails to secure [I].")
+		)
+
+		return TRUE
+
+	return TRUE
+
 /obj/structure/experimental_home_safe/proc/bind_to_current_property()
 	if(!SShousing)
 		return FALSE
 
-	/*
-	 * already bound.
-	 */
+
 	if(istext(safe_id) && length(safe_id))
 		return TRUE
 

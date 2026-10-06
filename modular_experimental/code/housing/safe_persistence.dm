@@ -1,78 +1,9 @@
 
 
 /obj/item
-	/*
-	 * null  = use normal safe rules
-	 * TRUE  = explicitly allow
-	 * FALSE = explicitly deny
-	 */
-	var/experimental_safe_persistence_override = null
-
-	/*
-	 * runtime-only bookkeeping.
-	 *
-	 * dis is the persistent slot currently backing this physical item.
-	 * It must never itself be serialized.
-	 */
 	var/tmp/experimental_safe_slot = null
 
 
-/obj/item/proc/experimental_can_persist_in_safe()
-	if(!isnull(experimental_safe_persistence_override))
-		return experimental_safe_persistence_override
-
-	/*
-	 * currency belongs in banking.
-	 */
-	if(istype(src, /obj/item/roguecoin))
-		return FALSE
-
-	/*
-	 * bulk economic materials are explicitly prohibited.
-	 */
-	if(istype(src, /obj/item/rogueore))
-		return FALSE
-
-	if(istype(src, /obj/item/ingot))
-		return FALSE
-
-	if(istype(src, /obj/item/stack))
-		return FALSE
-
-	// Weapons themselves are intentionally NOT prohibited here.
-
-	if(istype(src, /obj/item/ammo_casing))
-		return FALSE
-
-	/*
-	 * never allow nested storage.
-	 *
-	 * otherwise four safe slots could secretly contain four
-	 * entire backpacks of persistent inventory.
-	 */
-	if(istype(src, /obj/item/storage))
-		return FALSE
-
-	/*
-	 * mdicines, alcohol, poisons, crafting liquids, etc.
-	 */
-	if(istype(src, /obj/item/reagent_containers))
-		return FALSE
-
-	if(length(contents))
-		return FALSE
-
-	return TRUE
-
-
-/*
- * variables which a persistent safe preserves.
- *
- * this is intentionally a whitelist.
- *
- * individual item families can override this later if they have
- * some meaningful piece of persistent state which deserves to survive.
- */
 /obj/item/proc/experimental_safe_get_save_vars()
 	return list(
 		"name",
@@ -110,12 +41,7 @@
 		"polish_bonus",
 		"shoddy_repair",
 
-		/*
-		 * economic provenance.
-		 *
-		 * these are important to preserve so putting something into
-		 * a safe cannot wash restrictions off the item. sorry no money laundering.
-		 */
+
 		"looted",
 		"unmintable",
 		"from_stockpile",
@@ -151,14 +77,7 @@
 			"value" = value
 		)
 
-	/*
-	 * lists, datums, icons, files and other complex runtime values
-	 * are not implicitly persisted.
-	 *
-	 * if an item genuinely needs one later, give that item an
-	 * explicit persistence implementation rather than blindly
-	 * serializing arbitrary runtime state.
-	 */
+
 	return null
 
 
@@ -249,12 +168,7 @@
 	if(!length(json_text))
 		return FALSE
 
-	/*
-	 * write and validate a temporary file first.
-	 *
-	 * we do not keep stale backup copies because restoring an old
-	 * pre-withdrawal record could duplicate an item.
-	 */
+
 	var/temp_path = "[save_path].tmp"
 
 	if(fexists(temp_path))
@@ -344,12 +258,7 @@
 	if(!save_path)
 		return FALSE
 
-	/*
-	 * already absent is equivalent to successfully removed.
-	 *
-	 * dis also prevents a runtime item becoming permanently trapped
-	 * merely because its backing record was manually cleaned up.
-	 */
+
 	if(!fexists(save_path))
 		return TRUE
 
@@ -377,11 +286,7 @@
 	if(!I)
 		return null
 
-	/*
-	 * if policy changes between weekends, do not silently delete the
-	 * record. Leave it on disk for staff/migration and simply refuse
-	 * to materialize it.
-	 */
+
 	if(!I.experimental_can_persist_in_safe())
 		log_world("EXPERIMENTAL HOUSING: Safe '[safe_id]' slot [slot] contains '[item_type]' which current policy refuses.")
 		qdel(I)
@@ -390,12 +295,7 @@
 	var/list/saved_vars = record["vars"]
 
 	if(islist(saved_vars))
-		/*
-		 * iterate through the item's whitelist rather than blindly
-		 * trusting arbitrary variable names from disk.
-		 *
-		 * dis also gives us deterministic assignment ordering.
-		 */
+
 		for(var/variable in I.experimental_safe_get_save_vars())
 			CHECK_TICK
 
@@ -412,21 +312,13 @@
 
 			I.vars[variable] = experimental_safe_decode_value(encoded)
 
-	/*
-	 * brokenness is restored through the item's actual break logic
-	 * instead of simply flipping obj_broken.
-	 *
-	 * dat matters for Ratwood weapons because obj_break() changes
-	 * sharpness, parrying and related combat state.
-	 */
+
 	if(record["broken"] && !I.obj_broken)
 		I.obj_break(BRUTE)
 
 	I.experimental_safe_slot = slot
 
-	/*
-	 * refresh state which may depend upon the restored variables.
-	 */
+
 	I.update_force_dynamic()
 	I.update_damaged_state()
 	I.update_icon()
