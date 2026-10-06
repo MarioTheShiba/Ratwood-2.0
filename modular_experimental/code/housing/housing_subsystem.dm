@@ -6,7 +6,8 @@ SUBSYSTEM_DEF(housing)
 	var/list/property_turfs = list()
 	var/list/property_by_turf = list()
 	var/list/persistent_properties = list()
-
+	var/list/property_definitions = list()
+	var/list/property_records = list()
 
 /datum/controller/subsystem/housing/Initialize()
 	log_world("EXPERIMENTAL HOUSING: [length(property_turfs)] property region\s registered.")
@@ -17,6 +18,8 @@ SUBSYSTEM_DEF(housing)
 		log_property_bounds(property_id)
 
 	load_persistent_properties()
+	load_property_records()
+	load_persistent_properties()
 
 	return ..()
 
@@ -24,6 +27,7 @@ SUBSYSTEM_DEF(housing)
 
 /datum/controller/subsystem/housing/Shutdown()
 	save_persistent_properties()
+	save_property_records()
 
 /datum/controller/subsystem/housing/proc/register_property_turf(property_id, turf/T)
 	if(!istext(property_id) || !length(property_id))
@@ -277,3 +281,29 @@ SUBSYSTEM_DEF(housing)
 		return null
 
 	return property_by_turf[T]
+
+/datum/controller/subsystem/housing/proc/register_property_definition(
+	property_id,
+	property_type,
+	rent_amount = 0
+)
+	if(!istext(property_id) || !length(property_id))
+		return FALSE
+
+	if(!(property_type in list(
+		EXP_PROPERTY_TYPE_APARTMENT,
+		EXP_PROPERTY_TYPE_HOME,
+		EXP_PROPERTY_TYPE_MANSION
+	)))
+		return FALSE
+
+	if(property_definitions[property_id])
+		log_mapping("Duplicate Experimental housing definition for '[property_id]'.")
+		return FALSE
+
+	property_definitions[property_id] = list(
+		"property_type" = property_type,
+		"rent_amount" = max(0, round(rent_amount))
+	)
+
+	return TRUE

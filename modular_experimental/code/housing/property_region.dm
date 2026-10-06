@@ -47,3 +47,26 @@
 	 * marker itself to remain in the live round.
 	 */
 	return INITIALIZE_HINT_QDEL
+
+
+/obj/effect/landmark/property_definition
+	name = "property definition"
+	icon = 'modular_experimental/sprites/landmarks.dmi'
+	icon_state = "property"
+
+	var/property_id = null
+	var/property_type = EXP_PROPERTY_TYPE_APARTMENT
+	var/rent_amount = 0
+
+
+/obj/effect/landmark/property_definition/Initialize(mapload)
+	. = ..()
+
+	if(!SShousing.register_property_definition(
+		property_id,
+		property_type,
+		rent_amount
+	))
+		log_mapping("Invalid Experimental housing definition at [AREACOORD(src)].")
+
+	return INITIALIZE_HINT_QDEL

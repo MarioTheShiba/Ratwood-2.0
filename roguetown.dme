@@ -3544,6 +3544,7 @@
 #include "modular_experimental\code\tumor.dm"
 #include "modular_experimental\code\housing\_defines.dm"
 #include "modular_experimental\code\housing\housing_subsystem.dm"
+#include "modular_experimental\code\housing\property_records.dm"
 #include "modular_experimental\code\housing\map_saving.dm"
 #include "modular_experimental\code\housing\property.dm"
 #include "modular_experimental\code\housing\property_items.dm"

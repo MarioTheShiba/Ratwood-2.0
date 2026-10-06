@@ -164,10 +164,7 @@
 	save_flags = EXP_PROPERTY_SAVE_DEFAULT,
 	list/allowed_turfs = null
 )
-	/*
-	 * normalise coordinates so callers don't need to care which corner
-	 * they supplied first.
-	 */
+
 	var/real_min_x = min(min_x, max_x)
 	var/real_max_x = max(min_x, max_x)
 
@@ -184,10 +181,7 @@
 	var/height = real_max_y - real_min_y
 	var/depth = real_max_z - real_min_z
 
-	/*
-	 * number of possible cells determines how many characters our map
-	 * model keys might need.
-	 */
+
 	var/tile_count = (width + 1) * (height + 1) * (depth + 1)
 
 	var/list/key_chars = experimental_property_get_key_chars()
@@ -203,9 +197,7 @@
 
 	var/key_index = 1
 
-	/*
-	 * TGM stores each X coordinate as a vertical column.
-	 */
+
 	for(var/z_offset in 0 to depth)
 		for(var/x_offset in 0 to width)
 
@@ -242,10 +234,7 @@
 
 				var/has_contents = FALSE
 
-				/*
-				 * Save structures/machinery/etc, but never loose items
-				 * or /obj/effect internals during Phase 1.
-				 */
+
 				if(current_turf && save_current_turf && (save_flags & EXP_PROPERTY_SAVE_OBJECTS))
 					for(var/obj/thing in current_turf)
 						CHECK_TICK

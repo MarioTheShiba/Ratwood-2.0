@@ -10,3 +10,15 @@
 #define EXP_HOUSING_SAFE_DIRECTORY "modular_experimental/data/housing/safes"
 #define EXP_HOUSING_SAFE_RECORD_VERSION 1
 #define EXP_HOUSING_SAFE_DEFAULT_SLOTS 4
+
+
+#define EXP_PROPERTY_TYPE_APARTMENT "apartment"
+#define EXP_PROPERTY_TYPE_HOME "home"
+#define EXP_PROPERTY_TYPE_MANSION "mansion"
+
+#define EXP_PROPERTY_TENURE_VACANT "vacant"
+#define EXP_PROPERTY_TENURE_RENTED "rented"
+#define EXP_PROPERTY_TENURE_OWNED "owned"
+
+#define EXP_HOUSING_PROPERTY_RECORD_DIRECTORY "modular_experimental/data/housing/records"
+#define EXP_HOUSING_PROPERTY_RECORD_VERSION 1
