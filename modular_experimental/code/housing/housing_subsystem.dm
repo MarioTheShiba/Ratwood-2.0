@@ -4,6 +4,7 @@ SUBSYSTEM_DEF(housing)
 	flags = SS_NO_FIRE
 
 	var/list/property_turfs = list()
+	var/list/property_by_turf = list()
 
 
 /datum/controller/subsystem/housing/Initialize()
@@ -24,18 +25,26 @@ SUBSYSTEM_DEF(housing)
 	if(!T)
 		return FALSE
 
+	/*
+	 * One turf should never belong to two properties.
+	 */
+	var/existing_property_id = property_by_turf[T]
+
+	if(existing_property_id && existing_property_id != property_id)
+		log_mapping(
+			"Experimental housing turf at [AREACOORD(T)] belongs to both '[existing_property_id]' and '[property_id]'."
+		)
+
+		return FALSE
+
 	var/list/turfs = property_turfs[property_id]
 
 	if(!turfs)
 		turfs = list()
 		property_turfs[property_id] = turfs
 
-//This means we can later do:
-//
-//if(allowed_turfs[T])
-// instead of searching the entire list.
-
 	turfs[T] = TRUE
+	property_by_turf[T] = property_id
 
 	return TRUE
 
@@ -225,3 +234,10 @@ SUBSYSTEM_DEF(housing)
 	log_world("EXPERIMENTAL HOUSING: Loaded '[property_id]' from '[save_path]'.")
 
 	return TRUE
+
+
+/datum/controller/subsystem/housing/proc/get_property_id_at_turf(turf/T)
+	if(!T)
+		return null
+
+	return property_by_turf[T]

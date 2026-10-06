@@ -60,8 +60,9 @@
 	resistance_flags = INDESTRUCTIBLE
 
 	var/safe_id = null
-	var/max_persistent_slots = EXP_HOUSING_SAFE_DEFAULT_SLOTS
+	var/bound_property_id = null
 
+	var/max_persistent_slots = EXP_HOUSING_SAFE_DEFAULT_SLOTS
 
 /obj/structure/experimental_home_safe/ComponentInitialize()
 	. = ..()
@@ -123,6 +124,7 @@
 	 * so its stable persistence identity must survive that process.
 	 */
 	. |= "safe_id"
+	. |= "bound_property_id"
 	. |= "max_persistent_slots"
 
 
@@ -230,14 +232,44 @@
 	var/tmp/obj/item/transactional_removal = null
 
 
-/datum/component/storage/concrete/experimental_safe/Initialize()
-	var/obj/structure/experimental_home_safe/safe = parent
+/obj/structure/experimental_home_safe/Initialize(mapload)
+	. = ..()
 
-	if(istype(safe))
-		max_items = safe.max_persistent_slots
-		screen_max_rows = safe.max_persistent_slots
+	if(istext(safe_id) && length(safe_id))
+		if(!SShousing.register_safe(safe_id, src))
+			return INITIALIZE_HINT_QDEL
 
-	return ..()
+		load_persistent_contents()
+
+		return .
+
+	if(mapload)
+		return INITIALIZE_HINT_LATELOAD
+
+	if(!bind_to_current_property())
+		return .
+
+	if(!SShousing.register_safe(safe_id, src))
+		return INITIALIZE_HINT_QDEL
+
+	load_persistent_contents()
+
+	return .
+
+/obj/structure/experimental_home_safe/LateInitialize()
+	. = ..()
+
+	if(istext(safe_id) && length(safe_id))
+		return
+
+	if(!bind_to_current_property())
+		return
+
+	if(!SShousing.register_safe(safe_id, src))
+		qdel(src)
+		return
+
+	load_persistent_contents()
 
 
 /datum/component/storage/concrete/experimental_safe/slave_can_insert_object(
@@ -425,3 +457,74 @@
 	log_world(
 		"EXPERIMENTAL HOUSING: Caught non-standard removal of [I] from safe '[safe.safe_id]' slot [slot]; persistent record removed."
 	)
+
+/obj/structure/experimental_home_safe/proc/generate_safe_id(property_id)
+	if(!istext(property_id) || !length(property_id))
+		return null
+
+	var/property_slug = sanitize_filename(property_id)
+
+	for(var/attempt in 1 to 20)
+		/*
+		 * we only need to generate this once.
+		 *
+		 * da generated value is subsequently stored in the property's
+		 * DMM, so it does NOT change between rounds.
+		 */
+		var/hash = md5(
+			"[property_id]|[world.realtime]|[world.time]|[rand(1, 2147483647)]|\ref[src]|[attempt]"
+		)
+
+		var/candidate = "[property_slug]_safe_[copytext(hash, 1, 13)]"
+
+		var/obj/structure/experimental_home_safe/existing = SShousing.safe_instances[candidate]
+
+		if(existing && !QDELETED(existing))
+			continue
+
+		return candidate
+
+	return null
+
+
+/obj/structure/experimental_home_safe/proc/bind_to_current_property()
+	if(!SShousing)
+		return FALSE
+
+	/*
+	 * already bound.
+	 */
+	if(istext(safe_id) && length(safe_id))
+		return TRUE
+
+	var/turf/T = get_turf(src)
+
+	if(!T)
+		return FALSE
+
+	var/property_id = SShousing.get_property_id_at_turf(T)
+
+	if(!istext(property_id) || !length(property_id))
+		log_world(
+			"EXPERIMENTAL HOUSING: Home safe at [AREACOORD(src)] is not inside a registered property."
+		)
+
+		return FALSE
+
+	var/generated_id = generate_safe_id(property_id)
+
+	if(!generated_id)
+		log_world(
+			"EXPERIMENTAL HOUSING: Failed to generate safe ID for property '[property_id]' at [AREACOORD(src)]."
+		)
+
+		return FALSE
+
+	bound_property_id = property_id
+	safe_id = generated_id
+
+	log_world(
+		"EXPERIMENTAL HOUSING: New safe '[safe_id]' bound to property '[bound_property_id]' at [AREACOORD(src)]."
+	)
+
+	return TRUE
