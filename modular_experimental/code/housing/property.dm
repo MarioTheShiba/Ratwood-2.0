@@ -26,8 +26,6 @@
 	) as null|anything in list(
 		"Save 7x7 Property",
 		"Load 7x7 Property",
-		"Save Irregular Test Apartment",
-		"Load Irregular Test Apartment",
 		"Cancel"
 	)
 
@@ -36,18 +34,6 @@
 
 	if(choice == "Load 7x7 Property")
 		load_test_property(user)
-
-	if(choice == "Save Irregular Test Apartment")
-		if(SShousing.debug_save_property("test_apartment"))
-			to_chat(user, span_notice("Saved irregular test apartment."))
-		else
-			to_chat(user, span_warning("Failed to save irregular test apartment."))
-
-	if(choice == "Load Irregular Test Apartment")
-		if(SShousing.debug_load_property("test_apartment"))
-			to_chat(user, span_notice("Loaded irregular test apartment."))
-		else
-			to_chat(user, span_warning("Failed to load irregular test apartment."))
 
 // debug stuff and stuff
 

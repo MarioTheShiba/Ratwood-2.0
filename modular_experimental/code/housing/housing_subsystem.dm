@@ -5,6 +5,7 @@ SUBSYSTEM_DEF(housing)
 
 	var/list/property_turfs = list()
 	var/list/property_by_turf = list()
+	var/list/persistent_properties = list()
 
 
 /datum/controller/subsystem/housing/Initialize()
@@ -15,8 +16,14 @@ SUBSYSTEM_DEF(housing)
 		log_world("EXPERIMENTAL HOUSING: '[property_id]' contains [length(turfs)] turf\s.")
 		log_property_bounds(property_id)
 
+	load_persistent_properties()
+
 	return ..()
 
+
+
+/datum/controller/subsystem/housing/Shutdown()
+	save_persistent_properties()
 
 /datum/controller/subsystem/housing/proc/register_property_turf(property_id, turf/T)
 	if(!istext(property_id) || !length(property_id))
@@ -145,7 +152,7 @@ SUBSYSTEM_DEF(housing)
 
 
 //!!!!remove this later!!!!
-/datum/controller/subsystem/housing/proc/debug_save_property(property_id)
+/datum/controller/subsystem/housing/proc/save_property(property_id)
 	var/map_text = write_property_region(property_id)
 
 	if(!map_text)
@@ -154,18 +161,26 @@ SUBSYSTEM_DEF(housing)
 
 	var/save_path = experimental_property_get_save_path(property_id)
 
-	if(fexists(save_path))
-		fdel(save_path)
+	if(!save_path)
+		return FALSE
 
-	text2file(map_text, save_path)
+	if(fexists(save_path))
+		if(!fdel(save_path))
+			log_world("EXPERIMENTAL HOUSING: Could not replace property save '[save_path]'.")
+			return FALSE
+
+	if(!text2file(map_text, save_path))
+		log_world("EXPERIMENTAL HOUSING: Failed to write '[property_id]' to '[save_path]'.")
+		return FALSE
+
+	persistent_properties[property_id] = TRUE
 
 	log_world("EXPERIMENTAL HOUSING: Saved '[property_id]' to '[save_path]'.")
 
 	return TRUE
 
 
-// !!!!!!remove later!!!!!
-/datum/controller/subsystem/housing/proc/debug_load_property(property_id)
+/datum/controller/subsystem/housing/proc/load_property(property_id)
 	var/list/turfs = get_property_turfs(property_id)
 
 	if(!length(turfs))
@@ -181,7 +196,6 @@ SUBSYSTEM_DEF(housing)
 	var/save_path = experimental_property_get_save_path(property_id)
 
 	if(!save_path || !fexists(save_path))
-		log_world("EXPERIMENTAL HOUSING: Cannot load '[property_id]', save file '[save_path]' does not exist.")
 		return FALSE
 
 	var/min_x = bounds["min_x"]
@@ -193,7 +207,6 @@ SUBSYSTEM_DEF(housing)
 	if(!start)
 		log_world("EXPERIMENTAL HOUSING: Cannot load '[property_id]', invalid starting turf.")
 		return FALSE
-
 
 	for(var/turf/T as anything in turfs)
 		CHECK_TICK
@@ -224,9 +237,39 @@ SUBSYSTEM_DEF(housing)
 
 	qdel(template)
 
+	persistent_properties[property_id] = TRUE
+
 	log_world("EXPERIMENTAL HOUSING: Loaded '[property_id]' from '[save_path]'.")
 
 	return TRUE
+
+/datum/controller/subsystem/housing/proc/load_persistent_properties()
+	var/loaded = 0
+
+	for(var/property_id in property_turfs)
+		CHECK_TICK
+
+		var/save_path = experimental_property_get_save_path(property_id)
+
+		if(!save_path || !fexists(save_path))
+			continue
+
+		if(load_property(property_id))
+			loaded++
+
+	log_world("EXPERIMENTAL HOUSING: Automatically loaded [loaded] persistent propert[loaded == 1 ? "y" : "ies"].")
+
+
+/datum/controller/subsystem/housing/proc/save_persistent_properties()
+	var/saved = 0
+
+	for(var/property_id in persistent_properties)
+		CHECK_TICK
+
+		if(save_property(property_id))
+			saved++
+
+	log_world("EXPERIMENTAL HOUSING: Automatically saved [saved] persistent propert[saved == 1 ? "y" : "ies"].")
 
 
 /datum/controller/subsystem/housing/proc/get_property_id_at_turf(turf/T)
