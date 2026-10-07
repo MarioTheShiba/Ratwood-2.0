@@ -1,1 +1,1 @@
-{"version":1,"property_id":"test_apartment","property_type":"apartment","holder_id":null,"holder_name":null,"tenure_type":"vacant","rent_amount":50,"delinquent_rounds":0,"max_delinquent_rounds":3,"lock_id":"housing_test_apartment"}
+{"version":1,"property_id":"test_apartment","property_type":"apartment","holder_id":"mariotheshiba","holder_name":"Ezra","tenure_type":"rented","rent_amount":50,"delinquent_rounds":0,"max_delinquent_rounds":3,"lock_id":"housing_test_apartment"}

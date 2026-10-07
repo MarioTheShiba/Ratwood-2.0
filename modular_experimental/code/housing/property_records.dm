@@ -67,6 +67,169 @@
 /datum/controller/subsystem/housing/proc/get_property_record(property_id)
 	return property_records[property_id]
 
+
+
+/datum/controller/subsystem/housing/proc/normalize_property_holder_id(holder_id)
+	if(!istext(holder_id) || !length(holder_id))
+		return null
+
+	var/normalized_id = ckey(holder_id)
+
+	if(!length(normalized_id))
+		return null
+
+	return normalized_id
+
+
+/datum/controller/subsystem/housing/proc/assign_property_holder(
+	property_id,
+	holder_id,
+	holder_name,
+	tenure_type = EXP_PROPERTY_TENURE_RENTED,
+	mob/actor = null
+)
+	var/datum/experimental_property_record/record = get_property_record(property_id)
+
+	if(!record)
+		return FALSE
+
+	if(record.tenure_type != EXP_PROPERTY_TENURE_VACANT || record.holder_id)
+		return FALSE
+
+	if(!(tenure_type in list(EXP_PROPERTY_TENURE_RENTED, EXP_PROPERTY_TENURE_OWNED)))
+		return FALSE
+
+	var/normalized_holder_id = normalize_property_holder_id(holder_id)
+
+	if(!normalized_holder_id)
+		return FALSE
+
+	if(!istext(holder_name) || !length(holder_name))
+		return FALSE
+
+
+	var/old_holder_id = record.holder_id
+	var/old_holder_name = record.holder_name
+	var/old_tenure_type = record.tenure_type
+	var/old_delinquent_rounds = record.delinquent_rounds
+
+	record.holder_id = normalized_holder_id
+	record.holder_name = holder_name
+	record.tenure_type = tenure_type
+	record.delinquent_rounds = 0
+
+	if(!write_property_record(record))
+		record.holder_id = old_holder_id
+		record.holder_name = old_holder_name
+		record.tenure_type = old_tenure_type
+		record.delinquent_rounds = old_delinquent_rounds
+
+		return FALSE
+
+	var/actor_name = actor ? key_name(actor) : "SYSTEM"
+
+	log_game(
+		"EXPERIMENTAL HOUSING: [actor_name] assigned property '[property_id]' to [holder_name] ([normalized_holder_id]) as '[tenure_type]'."
+	)
+
+	return TRUE
+
+
+/datum/controller/subsystem/housing/proc/assign_property_holder_from_mob(
+	property_id,
+	mob/living/holder,
+	tenure_type = EXP_PROPERTY_TENURE_RENTED,
+	mob/actor = null
+)
+	if(!holder?.client)
+		return FALSE
+
+	return assign_property_holder(
+		property_id,
+		holder.client.ckey,
+		holder.real_name,
+		tenure_type,
+		actor
+	)
+
+
+/datum/controller/subsystem/housing/proc/clear_property_holder(
+	property_id,
+	mob/actor = null
+)
+	var/datum/experimental_property_record/record = get_property_record(property_id)
+
+	if(!record)
+		return FALSE
+
+	if(record.tenure_type == EXP_PROPERTY_TENURE_VACANT && !record.holder_id)
+		return TRUE
+
+	var/old_holder_id = record.holder_id
+	var/old_holder_name = record.holder_name
+	var/old_tenure_type = record.tenure_type
+	var/old_delinquent_rounds = record.delinquent_rounds
+
+	record.holder_id = null
+	record.holder_name = null
+	record.tenure_type = EXP_PROPERTY_TENURE_VACANT
+	record.delinquent_rounds = 0
+
+	if(!write_property_record(record))
+		record.holder_id = old_holder_id
+		record.holder_name = old_holder_name
+		record.tenure_type = old_tenure_type
+		record.delinquent_rounds = old_delinquent_rounds
+
+		return FALSE
+
+	var/actor_name = actor ? key_name(actor) : "SYSTEM"
+
+	log_game(
+		"EXPERIMENTAL HOUSING: [actor_name] cleared holder [old_holder_name] ([old_holder_id]) from property '[property_id]'."
+	)
+
+	return TRUE
+
+
+/datum/controller/subsystem/housing/proc/is_property_holder(
+	property_id,
+	holder_id
+)
+	var/datum/experimental_property_record/record = get_property_record(property_id)
+
+	if(!record?.holder_id)
+		return FALSE
+
+	var/normalized_holder_id = normalize_property_holder_id(holder_id)
+
+	if(!normalized_holder_id)
+		return FALSE
+
+	return record.holder_id == normalized_holder_id
+
+
+/datum/controller/subsystem/housing/proc/get_properties_for_holder(holder_id)
+	var/normalized_holder_id = normalize_property_holder_id(holder_id)
+
+	if(!normalized_holder_id)
+		return list()
+
+	var/list/results = list()
+
+	for(var/property_id in property_records)
+		var/datum/experimental_property_record/record = property_records[property_id]
+
+		if(!record)
+			continue
+
+		if(record.holder_id != normalized_holder_id)
+			continue
+
+		results[property_id] = record
+
+	return results
+
 /datum/controller/subsystem/housing/proc/create_property_record(property_id)
 	if(property_records[property_id])
 		return property_records[property_id]
