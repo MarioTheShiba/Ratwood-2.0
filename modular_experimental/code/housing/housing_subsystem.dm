@@ -1,4 +1,7 @@
 
+// i basically copied everything from vanderlin with my modifications put in.
+
+
 SUBSYSTEM_DEF(housing)
 	name = "Experimental Housing"
 	flags = SS_NO_FIRE
@@ -8,6 +11,7 @@ SUBSYSTEM_DEF(housing)
 	var/list/persistent_properties = list()
 	var/list/property_definitions = list()
 	var/list/property_records = list()
+	var/list/pending_property_doors = list()
 
 /datum/controller/subsystem/housing/Initialize()
 	log_world("EXPERIMENTAL HOUSING: [length(property_turfs)] property region\s registered.")
@@ -19,6 +23,12 @@ SUBSYSTEM_DEF(housing)
 
 	load_property_records()
 	load_persistent_properties()
+
+	for(var/obj/structure/mineral_door/wood/experimental_property/door as anything in pending_property_doors)
+		if(!door.bind_property_lock())
+			log_mapping("Experimental property door '[door.property_id]' at [AREACOORD(door)] could not bind its lock.")
+
+	pending_property_doors.Cut()
 
 	return ..()
 
@@ -308,3 +318,96 @@ SUBSYSTEM_DEF(housing)
 	)
 
 	return TRUE
+
+
+/datum/controller/subsystem/housing/proc/get_property_lockhash(property_id)
+	if(!istext(property_id) || !length(property_id))
+		return null
+
+	var/datum/experimental_property_record/record = get_property_record(property_id)
+
+	if(!record || !istext(record.lock_id) || !length(record.lock_id))
+		return null
+
+	var/property_lockhash = GLOB.lockids[record.lock_id]
+
+	if(property_lockhash)
+		return property_lockhash
+
+	property_lockhash = rand(1000, 9999)
+
+	while(property_lockhash in GLOB.lockhashes)
+		property_lockhash = rand(1000, 9999)
+
+	GLOB.lockhashes += property_lockhash
+	GLOB.lockids[record.lock_id] = property_lockhash
+
+	return property_lockhash
+
+
+/datum/controller/subsystem/housing/proc/create_property_key(property_id, atom/key_location)
+	if(!key_location)
+		return null
+
+	var/property_lockhash = get_property_lockhash(property_id)
+
+	if(!property_lockhash)
+		return null
+
+	var/datum/experimental_property_record/record = get_property_record(property_id)
+	var/obj/item/roguekey/experimental_property/key = new(key_location)
+
+	key.lockid = record.lock_id
+	key.lockhash = property_lockhash
+
+	return key
+
+/datum/controller/subsystem/housing/proc/issue_property_key(property_id, mob/living/recipient)
+	if(!istext(property_id) || !length(property_id))
+		return FALSE
+
+	if(!istype(recipient) || !recipient.client)
+		return FALSE
+
+	var/datum/experimental_property_record/record = get_property_record(property_id)
+
+	if(!record || !record.holder_id || record.tenure_type == EXP_PROPERTY_TENURE_VACANT)
+		return FALSE
+
+	if(!is_property_holder(property_id, recipient.client.ckey))
+		return FALSE
+
+	var/obj/item/roguekey/experimental_property/key = create_property_key(property_id, recipient)
+
+	if(!key)
+		return FALSE
+
+	return recipient.put_in_hands(key, del_on_fail = TRUE)
+
+/datum/controller/subsystem/housing/proc/get_property_management_data(mob/user)
+	var/list/properties = list()
+
+	for(var/property_id in property_records)
+		var/datum/experimental_property_record/record = property_records[property_id]
+
+		if(!record)
+			continue
+
+		var/is_vacant = record.tenure_type == EXP_PROPERTY_TENURE_VACANT
+		var/can_request_key = FALSE
+
+		if(isliving(user) && user.client && !is_vacant)
+			can_request_key = is_property_holder(record.property_id, user.client.ckey)
+
+		properties += list(list(
+			"property_id" = record.property_id,
+			"property_type" = record.property_type,
+			"holder_name" = record.holder_name,
+			"tenure_type" = record.tenure_type,
+			"rent_amount" = record.rent_amount,
+			"delinquent_rounds" = record.delinquent_rounds,
+			"is_vacant" = is_vacant,
+			"can_request_key" = can_request_key
+		))
+
+	return properties

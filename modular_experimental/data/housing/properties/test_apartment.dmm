@@ -33,10 +33,8 @@
 /turf/open/floor/rogue/wood,
 /area/rogue/outdoors/rtfield)
 "i" = (
-/obj/structure/mineral_door/wood{
-	icon_state = "woodhandleopen";
-	density = 0;
-	opacity = 0
+/obj/structure/mineral_door/wood/experimental_property{
+	property_id = "test_apartment"
 	},
 /turf/open/floor/rogue/dirt/road,
 /area/rogue/outdoors/rtfield)

@@ -1555,9 +1555,11 @@
 /turf/open/floor/rogue/rooftop/green/east,
 /area/rogue/outdoors)
 "Qt" = (
-/obj/structure/mineral_door/wood,
 /obj/effect/landmark/property_region{
 	property_id = test_apartment
+	},
+/obj/structure/mineral_door/wood/experimental_property{
+	property_id = "test_apartment"
 	},
 /turf/open/floor/rogue/dirt/road,
 /area/rogue/outdoors/rtfield)
