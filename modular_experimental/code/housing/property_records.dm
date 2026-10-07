@@ -8,6 +8,7 @@
 
 	var/rent_amount = 0
 	var/delinquent_rounds = 0
+	var/max_delinquent_rounds = 2
 
 	var/lock_id
 
@@ -15,11 +16,13 @@
 /datum/experimental_property_record/New(
 	new_property_id,
 	new_property_type = EXP_PROPERTY_TYPE_APARTMENT,
-	new_rent_amount = 0
+	new_rent_amount = 0,
+	new_max_delinquent_rounds = 2
 )
 	property_id = new_property_id
 	property_type = new_property_type
 	rent_amount = max(0, round(new_rent_amount))
+	max_delinquent_rounds = max(1, round(new_max_delinquent_rounds))
 	lock_id = experimental_property_make_lock_id(property_id)
 
 
@@ -57,31 +60,28 @@
 		"tenure_type" = tenure_type,
 		"rent_amount" = rent_amount,
 		"delinquent_rounds" = delinquent_rounds,
+		"max_delinquent_rounds" = max_delinquent_rounds,
 		"lock_id" = lock_id
 	)
 
-
 /datum/controller/subsystem/housing/proc/get_property_record(property_id)
 	return property_records[property_id]
-
 
 /datum/controller/subsystem/housing/proc/create_property_record(property_id)
 	if(property_records[property_id])
 		return property_records[property_id]
 
-	var/property_type = EXP_PROPERTY_TYPE_APARTMENT
-	var/rent_amount = 0
-
 	var/list/definition = property_definitions[property_id]
 
-	if(definition)
-		property_type = definition["property_type"]
-		rent_amount = definition["rent_amount"]
+	if(!definition)
+		log_mapping("Experimental housing property '[property_id]' has no property definition.")
+		return null
 
 	var/datum/experimental_property_record/record = new(
 		property_id,
-		property_type,
-		rent_amount
+		definition["property_type"],
+		definition["rent_amount"],
+		definition["max_delinquent_rounds"]
 	)
 
 	property_records[property_id] = record
@@ -176,7 +176,8 @@
 	var/datum/experimental_property_record/record = new(
 		property_id,
 		property_type,
-		data["rent_amount"]
+		data["rent_amount"],
+		data["max_delinquent_rounds"]
 	)
 
 	record.holder_id = data["holder_id"]

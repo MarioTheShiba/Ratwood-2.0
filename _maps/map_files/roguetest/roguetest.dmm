@@ -872,6 +872,17 @@
 /obj/item/rogueweapon/halberd/bardiche,
 /turf/open/floor/rogue/dirt/road,
 /area/rogue/indoors)
+"xS" = (
+/obj/effect/landmark/property_region{
+	property_id = test_apartment
+	},
+/obj/effect/landmark/property_definition{
+	property_id = "test_apartment";
+	rent_amount = 50;
+	max_delinquent_rounds = 3
+	},
+/turf/open/floor/rogue/wood,
+/area/rogue/outdoors/rtfield)
 "xU" = (
 /obj/effect/landmark/quest_spawner/easy,
 /turf/open/floor/rogue/cobblerock,
@@ -3448,7 +3459,7 @@ Rk
 Rk
 Of
 sG
-sG
+xS
 Of
 Of
 Of

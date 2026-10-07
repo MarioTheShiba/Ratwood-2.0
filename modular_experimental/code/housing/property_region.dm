@@ -57,6 +57,7 @@
 	var/property_id = null
 	var/property_type = EXP_PROPERTY_TYPE_APARTMENT
 	var/rent_amount = 0
+	var/max_delinquent_rounds = 2
 
 
 /obj/effect/landmark/property_definition/Initialize(mapload)
@@ -65,7 +66,8 @@
 	if(!SShousing.register_property_definition(
 		property_id,
 		property_type,
-		rent_amount
+		rent_amount,
+		max_delinquent_rounds
 	))
 		log_mapping("Invalid Experimental housing definition at [AREACOORD(src)].")
 

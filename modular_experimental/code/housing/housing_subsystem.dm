@@ -17,7 +17,6 @@ SUBSYSTEM_DEF(housing)
 		log_world("EXPERIMENTAL HOUSING: '[property_id]' contains [length(turfs)] turf\s.")
 		log_property_bounds(property_id)
 
-	load_persistent_properties()
 	load_property_records()
 	load_persistent_properties()
 
@@ -285,7 +284,8 @@ SUBSYSTEM_DEF(housing)
 /datum/controller/subsystem/housing/proc/register_property_definition(
 	property_id,
 	property_type,
-	rent_amount = 0
+	rent_amount = 0,
+	max_delinquent_rounds = 2
 )
 	if(!istext(property_id) || !length(property_id))
 		return FALSE
@@ -303,7 +303,8 @@ SUBSYSTEM_DEF(housing)
 
 	property_definitions[property_id] = list(
 		"property_type" = property_type,
-		"rent_amount" = max(0, round(rent_amount))
+		"rent_amount" = max(0, round(rent_amount)),
+		"max_delinquent_rounds" = max(1, round(max_delinquent_rounds))
 	)
 
 	return TRUE
